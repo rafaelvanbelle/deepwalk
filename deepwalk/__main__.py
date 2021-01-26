@@ -13,6 +13,7 @@ import logging
 from . import graph
 from . import walks as serialized_walks
 from gensim.models import Word2Vec
+from gensim.models.callbacks import CallbackAny2Vec
 from .skipgram import Skipgram
 
 from six import text_type as unicode
@@ -33,6 +34,23 @@ except AttributeError:
 
 logger = logging.getLogger(__name__)
 LOGFORMAT = "%(asctime).19s %(levelname)s %(filename)s: %(lineno)s %(message)s"
+
+class EpochLogger(CallbackAny2Vec):
+
+     def __init__(self):
+         self.epoch = 0
+
+     def on_train_begin(self, model):
+         print("we zijn vertrokken")
+
+     def on_epoch_begin(self, model):
+         print("Epoch #{} start".format(self.epoch))
+
+     def on_epoch_end(self, model):
+         print("Epoch #{} end".format(self.epoch))
+         self.epoch += 1
+
+epoch_logger = EpochLogger()
 
 
 def debug(type_, value, tb):
@@ -66,13 +84,15 @@ def process(args):
   data_size = num_walks * args.walk_length
 
   print("Data size (walks*length): {}".format(data_size))
+  print("hello")
 
   if data_size < args.max_memory_data_size:
     print("Walking...")
     walks = graph.build_deepwalk_corpus(G, num_paths=args.number_walks,
                                         path_length=args.walk_length, alpha=0, rand=random.Random(args.seed))
     print("Training...")
-    model = Word2Vec(walks, size=args.representation_size, window=args.window_size, min_count=0, sg=1, hs=1, workers=args.workers)
+    print("it's me")
+    model = Word2Vec(walks, size=args.representation_size, window=args.window_size, min_count=0, sg=1, hs=0, workers=args.workers, callbacks=[epoch_logger])
   else:
     print("Data size {} is larger than limit (max-memory-data-size: {}).  Dumping walks to disk.".format(data_size, args.max_memory_data_size))
     print("Walking...")
@@ -153,8 +173,8 @@ def main():
 
   args = parser.parse_args()
   numeric_level = getattr(logging, args.log.upper(), None)
-  logging.basicConfig(format=LOGFORMAT)
-  logger.setLevel(numeric_level)
+  logging.basicConfig(format=LOGFORMAT, level=logging.INFO)
+  
 
   if args.debug:
    sys.excepthook = debug
