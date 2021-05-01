@@ -123,7 +123,7 @@ class Graph(defaultdict):
 
   def number_of_nodes(self):
     "Returns the number of nodes in the graph"
-    return order()
+    return self.order()
 
   def random_walk(self, path_length, alpha=0, rand=random.Random(), start=None):
     """ Returns a truncated random walk.
@@ -152,15 +152,16 @@ class Graph(defaultdict):
 
 # TODO add build_walks in here
 
-def build_deepwalk_corpus(G, num_paths, path_length, alpha=0,
+def build_deepwalk_corpus(G, num_paths, path_length, start_nodes, alpha=0,
                       rand=random.Random(0)):
   walks = []
 
   nodes = list(G.nodes())
   
+
   for cnt in range(num_paths):
     rand.shuffle(nodes)
-    for node in nodes:
+    for node in start_nodes:
       walks.append(G.random_walk(path_length, rand=rand, alpha=alpha, start=node))
   
   return walks

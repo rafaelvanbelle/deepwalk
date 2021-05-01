@@ -75,6 +75,16 @@ def process(args):
   else:
     raise Exception("Unknown file format: '%s'.  Valid formats: 'adjlist', 'edgelist', 'mat'" % args.format)
 
+  #Load the list of fraud nodes from where walks are allowed to start
+  start_nodes = [] 
+  with open(args.start, 'r') as filehandle:
+    for line in filehandle:
+        # remove linebreak which is the last character of the string
+        currentPlace = line[:-1]
+
+        # add item to the list
+        start_nodes.append(int(currentPlace))
+  
   print("Number of nodes: {}".format(len(G.nodes())))
 
   num_walks = len(G.nodes()) * args.number_walks
@@ -85,13 +95,18 @@ def process(args):
 
   print("Data size (walks*length): {}".format(data_size))
   print("hello")
-
+  print(args.walk_length)
+  print(G.number_of_edges())
+  print(G.number_of_nodes())
   if data_size < args.max_memory_data_size:
     print("Walking...")
     walks = graph.build_deepwalk_corpus(G, num_paths=args.number_walks,
-                                        path_length=args.walk_length, alpha=0, rand=random.Random(args.seed))
+                                        path_length=args.walk_length, start_nodes = start_nodes, alpha=0, rand=random.Random(args.seed))
+    print(walks[0])
+    
     print("Training...")
     print("it's me")
+
     model = Word2Vec(walks, size=args.representation_size, window=args.window_size, min_count=0, sg=1, hs=0, workers=args.workers, callbacks=[epoch_logger])
   else:
     print("Data size {} is larger than limit (max-memory-data-size: {}).  Dumping walks to disk.".format(data_size, args.max_memory_data_size))
@@ -116,7 +131,8 @@ def process(args):
                      window=args.window_size, min_count=0, trim_rule=None, workers=args.workers)
 
   model.wv.save_word2vec_format(args.output)
-
+  if args.output_word2vec:
+    model.save(args.output_word2vec)
 
 def main():
   parser = ArgumentParser("deepwalk",
@@ -147,6 +163,9 @@ def main():
   parser.add_argument('--output', required=True,
                       help='Output representation file')
 
+  parser.add_argument('--output_word2vec', default=None,
+                      help='Location to save the word2vec model for continuing training later')
+
   parser.add_argument('--representation-size', default=64, type=int,
                       help='Number of latent dimensions to learn for each node.')
 
@@ -169,6 +188,8 @@ def main():
 
   parser.add_argument('--workers', default=1, type=int,
                       help='Number of parallel processes.')
+
+  parser.add_argument('--start', default=None, help='path to list file')
 
 
   args = parser.parse_args()
