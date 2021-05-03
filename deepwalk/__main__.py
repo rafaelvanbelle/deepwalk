@@ -163,7 +163,7 @@ def main():
   parser.add_argument('--output', required=True,
                       help='Output representation file')
 
-  parser.add_argument('--output_word2vec', default=None,
+  parser.add_argument('--output-word2vec',
                       help='Location to save the word2vec model for continuing training later')
 
   parser.add_argument('--representation-size', default=64, type=int,
