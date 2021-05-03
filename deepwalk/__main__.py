@@ -123,8 +123,8 @@ def process(args):
                      window=args.window_size, min_count=0, trim_rule=None, workers=args.workers)
 
   model.wv.save_word2vec_format(args.output)
-  if args.output-word2vec:
-    model.save(args.output-word2vec)
+  if args.output_word2vec:
+    model.save(args.output_word2vec)
 
 def main():
   parser = ArgumentParser("deepwalk",
