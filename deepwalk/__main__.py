@@ -75,15 +75,7 @@ def process(args):
   else:
     raise Exception("Unknown file format: '%s'.  Valid formats: 'adjlist', 'edgelist', 'mat'" % args.format)
 
-  #Load the list of fraud nodes from where walks are allowed to start
-  start_nodes = [] 
-  with open(args.start, 'r') as filehandle:
-    for line in filehandle:
-        # remove linebreak which is the last character of the string
-        currentPlace = line[:-1]
-
-        # add item to the list
-        start_nodes.append(int(currentPlace))
+  
   
   print("Number of nodes: {}".format(len(G.nodes())))
 
@@ -101,7 +93,7 @@ def process(args):
   if data_size < args.max_memory_data_size:
     print("Walking...")
     walks = graph.build_deepwalk_corpus(G, num_paths=args.number_walks,
-                                        path_length=args.walk_length, start_nodes = start_nodes, alpha=0, rand=random.Random(args.seed))
+                                        path_length=args.walk_length, alpha=0, rand=random.Random(args.seed))
     print(walks[0])
     
     print("Training...")
