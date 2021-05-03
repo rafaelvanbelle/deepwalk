@@ -123,8 +123,8 @@ def process(args):
                      window=args.window_size, min_count=0, trim_rule=None, workers=args.workers)
 
   model.wv.save_word2vec_format(args.output)
-  if args.output_word2vec:
-    model.save(args.output_word2vec)
+  if args.output-word2vec:
+    model.save(args.output-word2vec)
 
 def main():
   parser = ArgumentParser("deepwalk",
@@ -155,7 +155,7 @@ def main():
   parser.add_argument('--output', required=True,
                       help='Output representation file')
 
-  parser.add_argument('--output_word2vec', default=None,
+  parser.add_argument('--output-word2vec', default=None,
                       help='Location to save the word2vec model for continuing training later')
 
   parser.add_argument('--representation-size', default=64, type=int,
